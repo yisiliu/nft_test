@@ -19,15 +19,22 @@ contract("TestNFT", accounts => {
         assert.equal(ownership, accounts[1]);
     });
 
-    it("Should return the remaining tokens for the state 0", async () => {
+    it("Should return the limit for the state 0", async () => {
         const remaining = await nft.check_availability(0);
         assert.equal(remaining, 8);
     });
 
-    it("Should reset the remaining tokens for the state 0", async () => {
+    it("Should reset the limit for the state 0", async () => {
         await nft.modify_limits.sendTransaction(0, 1);
         const remaining = await nft.check_availability(0);
         assert.equal(remaining, 9);
+    });
+
+    it("Should add account 1 as admin and increase the limit for the state 0", async () => {
+        await nft.modify_admin.sendTransaction(accounts[1], true);
+        await nft.modify_limits.sendTransaction(0, 1, {"from": accounts[1]});
+        const remaining = await nft.check_availability(0);
+        assert.equal(remaining, 10);
     });
 
 });
