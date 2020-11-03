@@ -19,6 +19,16 @@ contract("TestNFT", accounts => {
         assert.equal(ownership, accounts[1]);
     });
 
+    it("Should not transfer a newly minted token to account 1 since claimed", async () => {
+        try{
+            await nft.mintStateToken.sendTransaction(accounts[1], 0);
+        }
+        catch(e){
+            assert.equal(e['reason'], "Already Claimed.");
+        }
+
+    });
+
     it("Should return the limit for the state 0", async () => {
         const remaining = await nft.check_availability(0);
         assert.equal(remaining, 8);
@@ -36,5 +46,6 @@ contract("TestNFT", accounts => {
         const remaining = await nft.check_availability(0);
         assert.equal(remaining, 10);
     });
+
 
 });
