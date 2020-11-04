@@ -4,7 +4,7 @@ import "openzeppelin-solidity/contracts/token/ERC721/ERC721.sol";
 
 contract TestNFT is ERC721 {
 
-    uint8[] private state_limits = [9,3,11,6,55,9,7,3,3,29,16,4,4,20,11,6,6,8,8,4,10,11,16,10,6,10,3,5,6,4,14,5,29,15,3,18,7,7,20,4,9,3,11,38,6,3,13,12,5,10,3];
+    uint8[] private state_limits = new uint8[](52);
     address private creator;
     mapping (address => bool) admin;
     mapping (bytes32 => bool) claimed;
@@ -13,6 +13,9 @@ contract TestNFT is ERC721 {
         _setBaseURI("https://mask-president-2020.s3.ap-east-1.amazonaws.com/");
         creator = msg.sender;
         admin[creator] = true;
+        for(uint i = 0; i < 52; i++){
+            state_limits[i] = 0;
+        }
     }
 
     function mintStateToken(address claimer, uint8 state) public returns (uint256) {
@@ -32,7 +35,8 @@ contract TestNFT is ERC721 {
 
     function modify_limits(uint8 state, int8 delta) public {
         require(admin[msg.sender], "Not authorized.");
-        require(int8(state_limits[state]) + delta > 0);        
+        require(delta < 64, "Non Overflow");        
+        require(int8(state_limits[state]) + delta > 0, "Non Negative");        
         state_limits[state] = uint8(int8(state_limits[state]) + delta);
     }
 

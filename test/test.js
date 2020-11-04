@@ -12,6 +12,12 @@ contract("TestNFT", accounts => {
         assert.equal(_baseURI, "https://mask-president-2020.s3.ap-east-1.amazonaws.com/");
     });
 
+    it("Should lift the state limit for the state 0", async () => {
+        const magic = await nft.modify_limits.sendTransaction(0, 9);
+        const remaining = await nft.check_availability(0);
+        assert.equal(remaining, 9);
+    });
+
     it("Should transfer a newly minted token to account 1", async () => {
         const magic = await nft.mintStateToken.sendTransaction(accounts[1], 0);
         const _id = web3.utils.soliditySha3({t: 'uint8', v: 0}, {t: 'uint8', v: 8});
@@ -47,5 +53,14 @@ contract("TestNFT", accounts => {
         assert.equal(remaining, 10);
     });
 
+    it("Should not transfer a newly minted token to account 1 since limit is not set", async () => {
+        try{
+            await nft.mintStateToken.sendTransaction(accounts[1], 1);
+        }
+        catch(e){
+            assert.equal(e['reason'], "Out of stock.");
+        }
+
+    });
 
 });
